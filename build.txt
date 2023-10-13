@@ -1,0 +1,4 @@
+displayName = ECSParticle
+author = Lastprismer
+version = 0.1
+dllReferences = arch/Arch,arch/Collections.Pooled,arch/CommunityToolkit.HighPerformance,arch/JobScheduler,arch/Microsoft.Extensions.ObjectPool

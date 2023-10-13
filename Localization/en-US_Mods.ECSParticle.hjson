@@ -1,0 +1,6 @@
+Items: {
+	BasicSword: {
+		DisplayName: Basic Sword
+		Tooltip: ""
+	}
+}
