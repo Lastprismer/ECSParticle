@@ -31,8 +31,13 @@ namespace ECSParticle.Content.Items
         }
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
-            Arch.Core.Entity entity = ParticleSystem.NewParticle(ModContent.GetInstance<BallLightning>(), player.Center, velocity, Color.White);
-            //entity.Add(new ParticleDrawBehindEntities { });
+            for(int i = 0; i < 1; i++)
+            {
+                Arch.Core.Entity entity = ParticleSystem.NewParticle(ModContent.GetInstance<BallLightning>(), player.Center, Vector2.Zero, Color.White);
+                entity.Add(new ParticleDrawBehindEntities { });
+                entity.Add(new ParticleData<int> { Value = player.whoAmI });
+
+            }
 
 
             return false;

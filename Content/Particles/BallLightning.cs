@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace ECSParticle.Content.Particles
@@ -27,30 +28,41 @@ namespace ECSParticle.Content.Particles
         public const int MAX_TIME_LEFT = 240;
         public override void OnSpawn(in Arch.Core.Entity entity)
         {
-            //entity.Add(new BallLightningData { Frame = 0, FrameCounter = 0, Timer = 0 });
+            entity.Add(new BallLightningData { Frame = 0, FrameCounter = 0, Timer = 0 });
+
         }
         public override void Update(in Arch.Core.Entity entity)
         {
+            // 获取数据的方法
             ref var velocity = ref entity.Get<ParticleVelocity>();
             ref var rotation = ref entity.Get<ParticleRotation>();
             ref var position = ref entity.Get<ParticlePosition>();
             ref var scale = ref entity.Get<ParticleScale>();
             ref var active = ref entity.Get<ParticleActive>();
+            ref var owner = ref entity.Get<ParticleData<int>>();
             ref var data = ref entity.Get<BallLightningData>();
-            Main.NewText($"{position.Value.X}, {position.Value.Y}");
 
             if (++data.FrameCounter >= FRAME_DLT)
             {
-                data.Frame = (data.Frame + 1) % FRAME_NUM;
+                data.FrameCounter = 0;
+                data.Frame = (data.Frame + 1) % 3;
             }
 
             rotation.Value += 0.3f;
-            scale.Value = MathF.Sin(Main.GlobalTimeWrappedHourly);
-            
-            if(++data.Timer > MAX_TIME_LEFT)
+            //scale.Value = MathF.Sin(Main.GlobalTimeWrappedHourly) / 3 + 1;
+
+            if (++data.Timer > MAX_TIME_LEFT)
             {
                 active.Value = false;
                 return;
+            }
+
+            // 示例：花式东西
+            Player player = Main.player[owner.Value];
+            position.Value = player.Center + new Vector2(100).RotatedBy(Main.GlobalTimeWrappedHourly * 3) + new Vector2(100).RotatedBy(Main.GlobalTimeWrappedHourly * 5);
+            if(data.Timer % 30 == 0)
+            {
+                Projectile.NewProjectile(null, position.Value, Main.rand.NextVector2CircularEdge(10, 10), ProjectileID.MagnetSphereBall, 100, 0, owner.Value);
             }
 
         }
@@ -64,7 +76,7 @@ namespace ECSParticle.Content.Particles
             var data = entity.Get<BallLightningData>();
             Rectangle rect = texture.Frame(1, FRAME_NUM, 0, data.Frame);
 
-            spriteBatch.Draw(texture, pos - Main.screenPosition, rect, color, rotation, texture.Size() / 2, scale, SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, pos - Main.screenPosition, rect, color * MathHelper.Clamp((MAX_TIME_LEFT - data.Timer) / 60f, 0, 1), rotation, rect.Size() / 2, scale, SpriteEffects.None, 0);
         }
     }
 }
